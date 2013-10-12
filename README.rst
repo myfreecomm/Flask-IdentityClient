@@ -1,5 +1,5 @@
-.. _PassaportWeb: https://app.passaporteweb.com.br/
 .. _Flask: http://flask.pocoo.org/docs/
+.. _PassaporteWeb: https://app.passaporteweb.com.br/
 
 ====================
 Flask-IdentityClient
