@@ -19,7 +19,7 @@ class TestIndex(TestCase):
         else:
             return url_for(self.endpoint)
 
-    @patch('identity_client.views.session')
+    @patch('flask_identity_client.views.session')
     def test_index_redirects_to_login(self, session):
         session.get.return_value = None
         response = self.client.get(self.get_url())
@@ -28,8 +28,8 @@ class TestIndex(TestCase):
         self.assertEqual(response.headers['Location'], url_for('identity_client.login', _external=True))
         session.get.assert_called_once_with('access_token')
 
-    @patch('identity_client.views.PWRemoteApp')
-    @patch('identity_client.views.session')
+    @patch('flask_identity_client.views.PWRemoteApp')
+    @patch('flask_identity_client.views.session')
     def test_inactive_user(self, session, remote_app):
         session.get.return_value = ('R0JaNT1RKNDP', 'W3oZSRHACS090Xwf')
         remote_app_instance = remote_app.get_instance.return_value
@@ -63,8 +63,8 @@ class TestIndex(TestCase):
             'accounts': ['d9a795c8-c891-4665-ac63-9d408209be29'],
         })
 
-    @patch('identity_client.views.PWRemoteApp')
-    @patch('identity_client.views.session')
+    @patch('flask_identity_client.views.PWRemoteApp')
+    @patch('flask_identity_client.views.session')
     def test_unauthorized_user(self, session, remote_app):
         session.get.return_value = ('R0JaNT1RKNDP', 'W3oZSRHACS090Xwf')
         remote_app_instance = remote_app.get_instance.return_value
@@ -83,8 +83,8 @@ class TestIndex(TestCase):
         remote_app.get_instance.assert_called_once_with()
         remote_app_instance.post.assert_called_once_with(fetch_user_data_url)
 
-    @patch('identity_client.views.PWRemoteApp')
-    @patch('identity_client.views.session')
+    @patch('flask_identity_client.views.PWRemoteApp')
+    @patch('flask_identity_client.views.session')
     def test_new_account(self, session, remote_app):
         session.get.return_value = ('R0JaNT1RKNDP', 'W3oZSRHACS090Xwf')
         remote_app_instance = remote_app.get_instance.return_value
@@ -118,8 +118,8 @@ class TestIndex(TestCase):
             'accounts': ['d9a795c8-c891-4665-ac63-9d408209be29'],
         })
 
-    @patch('identity_client.views.PWRemoteApp')
-    @patch('identity_client.views.session')
+    @patch('flask_identity_client.views.PWRemoteApp')
+    @patch('flask_identity_client.views.session')
     def test_next_url(self, session, remote_app):
         session.get.return_value = ('R0JaNT1RKNDP', 'W3oZSRHACS090Xwf')
         remote_app_instance = remote_app.get_instance.return_value
@@ -152,8 +152,8 @@ class TestLogin(TestCase):
         else:
             return url_for(self.endpoint)
 
-    @patch('identity_client.views.PWRemoteApp')
-    @patch('identity_client.views.session')
+    @patch('flask_identity_client.views.PWRemoteApp')
+    @patch('flask_identity_client.views.session')
     def test_login(self, session, remote_app):
         remote_app_instance = remote_app.get_instance.return_value
         remote_app_instance.authorize.return_value = 'AUTHORIZED'
@@ -165,8 +165,8 @@ class TestLogin(TestCase):
         remote_app_instance.authorize.assert_called_once_with(
             callback = url_for('identity_client.authorized', _external=True))
 
-    @patch('identity_client.views.PWRemoteApp')
-    @patch('identity_client.views.session')
+    @patch('flask_identity_client.views.PWRemoteApp')
+    @patch('flask_identity_client.views.session')
     def test_next_url(self, session, remote_app):
         remote_app_instance = remote_app.get_instance.return_value
         remote_app_instance.authorize.return_value = 'AUTHORIZED'
@@ -187,8 +187,8 @@ class TestAuthorized(TestCase):
         else:
             return url_for(self.endpoint)
 
-    @patch('identity_client.views.PWRemoteApp')
-    @patch('identity_client.views.session')
+    @patch('flask_identity_client.views.PWRemoteApp')
+    @patch('flask_identity_client.views.session')
     def test_authorized(self, session, remote_app):
         remote_app_instance = remote_app.get_instance.return_value
 
@@ -210,8 +210,8 @@ class TestAuthorized(TestCase):
         self.assertTrue(remote_app_instance.authorized_handler.called)
         session.__setitem__.assert_called_once_with('access_token', ('R0JaNT1RKNDP', 'W3oZSRHACS090Xwf'))
 
-    @patch('identity_client.views.PWRemoteApp')
-    @patch('identity_client.views.session')
+    @patch('flask_identity_client.views.PWRemoteApp')
+    @patch('flask_identity_client.views.session')
     def test_next_url(self, session, remote_app):
         remote_app_instance = remote_app.get_instance.return_value
 
@@ -243,7 +243,7 @@ class TestLogout(TestCase):
         else:
             return url_for(self.endpoint)
 
-    @patch('identity_client.views.session')
+    @patch('flask_identity_client.views.session')
     def test_logout(self, session):
         pop_response = { 'user_data': '', 'access_token': '' }
         def side_effect(key, default):

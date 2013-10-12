@@ -38,7 +38,7 @@ from flask import Flask
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-from identity_client.startup_funcs import user_required
+from flask_identity_client.startup_funcs import user_required
 @app.route('/')
 def index():
     return user_required() or 'OK'
@@ -47,5 +47,5 @@ def index():
 #-----------------------------------------------------------------------
 # indentity_client blueprint
 
-from identity_client.application import blueprint
+from flask_identity_client.application import blueprint
 app.register_blueprint(blueprint, url_prefix='/sso')

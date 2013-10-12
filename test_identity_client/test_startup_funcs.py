@@ -5,7 +5,7 @@ from flask import g, url_for
 from mock import patch
 from ._base import TestCase
 
-from identity_client.startup_funcs import user_required
+from flask_identity_client.startup_funcs import user_required
 
 
 __all__ = ['TestUserRequired']
@@ -16,7 +16,7 @@ class TestUserRequired(TestCase):
     def setUp(self):
         self.account_uuid = 'd9a795c8-c891-4665-ac63-9d408209be29'
 
-    @patch('identity_client.startup_funcs.session')
+    @patch('flask_identity_client.startup_funcs.session')
     def test_user_required(self, mock_session):
         uuid = self.account_uuid
 
@@ -39,7 +39,7 @@ class TestUserRequired(TestCase):
         })
         self.assertEqual(session, {})
 
-    @patch('identity_client.startup_funcs.session')
+    @patch('flask_identity_client.startup_funcs.session')
     def test_no_user(self, mock_session):
         mock_session.get.return_value = None
         response = user_required()
@@ -47,7 +47,7 @@ class TestUserRequired(TestCase):
         self.assertStatus(response, 302)
         self.assertEqual(response.headers['Location'], url_for('identity_client.index', next='http://localhost/'))
 
-    @patch('identity_client.startup_funcs.session')
+    @patch('flask_identity_client.startup_funcs.session')
     def test_no_account(self, mock_session):
         session = {
             'user_data': {
