@@ -1,10 +1,10 @@
 # coding: UTF-8
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from importlib import import_module
 from flask import current_app as app, escape, redirect, request, url_for, session
 from flaskext.oauth import OAuthRemoteApp, OAuthException, parse_response
 from .application import blueprint
+from .models import get_service_account
 
 __all__ = []
 
@@ -14,9 +14,7 @@ def index():
     #-------------------------------------------------------------------
     # Autenticação
     #
-    service_account_module = import_module(app.config['SERVICE_ACCOUNT'])
-    ServiceAccount = service_account_module.ServiceAccount
-
+    ServiceAccount = get_service_account()
     access_token = session.get('access_token')
 
     if access_token is None:
