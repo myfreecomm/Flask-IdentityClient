@@ -9,7 +9,7 @@ __all__ = ['app']
 DEBUG = False
 TESTING = True
 SECRET_KEY = b's17a!@M1uOv0cI_/$}@6uoJM(7,0y{Ci=N1:N3&>BG%&:V6+'
-SERVICE_ACCOUNT = 'model_resource'
+SERVICE_ACCOUNT = 'model_resource.ServiceAccount'
 
 ENTRYPOINT = 'index'
 
@@ -18,16 +18,16 @@ PASSAPORTE_WEB = {
     'SLUG': 'charging',
     'CONSUMER_TOKEN': '295KkblCDT',
     'CONSUMER_SECRET': 'EeAlpeFt6VteErylmwkCtLZ9qHtpomgG',
-    'AUTH_API': 'accounts/api/auth/',
-    'REGISTRATION_API': 'accounts/api/create/',
-    'PROFILE_API': 'profile/api/info/',
-    'REQUEST_TOKEN_PATH': 'sso/initiate/',
-    'AUTHORIZATION_PATH': 'sso/authorize/',
-    'ACCESS_TOKEN_PATH': 'sso/token/',
-    'ACCESS_TOKEN_VALIDATION': 'oauth/1.0/api/resource_owner/',
-    'FETCH_USER_DATA_PATH': 'sso/fetchuserdata/',
-    'FETCH_ACCOUNTS': 'organizations/api/identities/{uuid}/accounts/',
-    'LOGOUT_PATH': 'accounts/logout/',
+    'AUTH_API': '/accounts/api/auth/',
+    'REGISTRATION_API': '/accounts/api/create/',
+    'PROFILE_API': '/profile/api/info/',
+    'REQUEST_TOKEN_PATH': '/sso/initiate/',
+    'AUTHORIZATION_PATH': '/sso/authorize/',
+    'ACCESS_TOKEN_PATH': '/sso/token/',
+    'ACCESS_TOKEN_VALIDATION': '/oauth/1.0/api/resource_owner/',
+    'FETCH_USER_DATA_PATH': '/sso/fetchuserdata/',
+    'FETCH_ACCOUNTS': '/organizations/api/identities/{uuid}/accounts/',
+    'LOGOUT_PATH': '/accounts/logout/',
 }
 
 
