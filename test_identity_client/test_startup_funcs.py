@@ -61,6 +61,4 @@ class TestUserRequired(TestCase):
         mock_session.get.side_effect = side_effect
 
         response = user_required()
-
-        self.assertStatus(response, 302)
-        self.assertEqual(response.headers['Location'], url_for('identity_client.index', next='http://localhost/'))
+        self.assertIsNone(response)
