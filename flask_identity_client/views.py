@@ -22,18 +22,7 @@ def index():
 
     config = app.config['PASSAPORTE_WEB']
     fetch_user_data_url = '/'.join((config['HOST'], config['FETCH_USER_DATA_PATH']))
-    ecommerce = app.config.get('ECOMMERCE_URL', config['HOST'])
-
     original_user_data = PWRemoteApp.get_instance().post(fetch_user_data_url).data
-
-    #-------------------------------------------------------------------
-    # Autorização
-    #
-    accounts = [account for account in original_user_data.get('accounts', [])]
-
-    if not accounts:
-        # TODO: esta crítica pode ser desnecessária
-        return redirect(ecommerce)
 
     #-------------------------------------------------------------------
     # Extração de dados
@@ -55,7 +44,7 @@ def index():
     else:
         user_data['full_name'] = user_data['email']
 
-    user_data['accounts'] = ServiceAccount.update(accounts)
+    user_data['accounts'] = ServiceAccount.update(original_user_data.get('accounts', []))
     session['user_data'] = user_data
 
     next_url = escape(request.values.get('next') \

@@ -65,23 +65,32 @@ class TestIndex(TestCase):
 
     @patch('flask_identity_client.views.PWRemoteApp')
     @patch('flask_identity_client.views.session')
-    def test_unauthorized_user(self, session, remote_app):
+    def test_user_without_accounts(self, session, remote_app):
         session.get.return_value = ('R0JaNT1RKNDP', 'W3oZSRHACS090Xwf')
         remote_app_instance = remote_app.get_instance.return_value
         remote_app_instance.post.return_value.data = {
+            'uuid': 'a82670c2-027e-4079-b5c7-81f2433041b3',
+            'email': 'johndoe@myfreecomm.com.br',
             'is_active': True,
             'accounts': [],
         }
+
         response = self.client.get(self.get_url())
         self.assertStatus(response, 302)
 
         config = self.app.config['PASSAPORTE_WEB']
         fetch_user_data_url = '/'.join((config['HOST'], config['FETCH_USER_DATA_PATH']))
-        ecommerce = config['HOST']
 
-        self.assertEqual(response.headers['Location'], ecommerce)
+        self.assertEqual(response.headers['Location'], url_for('index', _external=True))
         remote_app.get_instance.assert_called_once_with()
         remote_app_instance.post.assert_called_once_with(fetch_user_data_url)
+
+        session.__setitem__.assert_called_once_with('user_data', {
+            'uuid': 'a82670c2-027e-4079-b5c7-81f2433041b3',
+            'email': 'johndoe@myfreecomm.com.br',
+            'full_name': 'johndoe@myfreecomm.com.br',
+            'accounts': [],
+        })
 
     @patch('flask_identity_client.views.PWRemoteApp')
     @patch('flask_identity_client.views.session')

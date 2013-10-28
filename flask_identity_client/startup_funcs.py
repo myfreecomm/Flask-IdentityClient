@@ -10,5 +10,5 @@ def user_required():
     login_url = url_for('identity_client.index', next=request.url)
 
     user_data = g.user_data = session.get('user_data')
-    if not (user_data and user_data.get('accounts')):
+    if not user_data:
         return redirect(login_url)
