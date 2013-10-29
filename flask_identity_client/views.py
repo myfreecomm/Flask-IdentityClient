@@ -127,7 +127,9 @@ class PWRemoteApp(OAuthRemoteApp):
 
                 # where flask should look for new request tokens
                 request_token_url = config['REQUEST_TOKEN_PATH'],
-                request_token_params = { 'scope': 'auth:api' },
+                request_token_params = {
+                    'scope': escape(config.get('SCOPE', 'auth:api')),
+                },
 
                 # where flask should exchange the token with the remote application
                 access_token_url = config['ACCESS_TOKEN_PATH'],
