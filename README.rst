@@ -34,6 +34,8 @@ Os *settings* do Flask precisam conter as seguntes chaves:
   - ``AUTHORIZATION_PATH``: *PATY* da URL de autorização. Ex.:
     ``/sso/authorize/``.
 
+  - ``SCOPE``: escopo OAuth, padrão: ``auth:api``.
+
   - ``CONSUMER_TOKEN`` e ``CONSUMER_SECRET``: credenciais de autenticação
     do consumidor.
 
@@ -72,3 +74,29 @@ de classe ``update()``, que recebe uma lista de dicionários
 representando as contas de cobrança identificados para o usuário no
 PassaporteWeb, e deve retornar uma lista dos UUIDs válidos na aplicação
 local.
+
+
+Obtendo recursos de um serviço atravessador
+-------------------------------------------
+
+É possível obter recursos de um serviço atravessador através do *factory*
+de funções *startup* ``flask_identity_client.startup_funcs.resources_from_middle``.
+
+O *factory* recebe como parâmetro a chave do dicionário de configurações
+no *config* da aplicação. O dicionário deve ter as seguintes informações:
+
+- ``TOKEN``: *token* de acesso ao serviço atravessador.
+
+- ``SECRET``: chave secreta associada ao *token*.
+
+- ``HOST``: serviço atravessador, incluindo o protocolo (``http://`` ou
+  ``https://``).
+
+- ``PATH``: caminha na API do serviço atravessador que retorna os recursos.
+
+
+O resultado é armazenado na sessão, referenciado pela chave ``resources``.
+Caso ocorra algum erro, a chave existirá, mas o valor será ``None``.
+
+Observação: é preciso estar logado no PassaporteWeb, pois o serviço
+atravessador receberá os mesmos dados do *login*.

@@ -13,6 +13,13 @@ SERVICE_ACCOUNT = 'model_resource.ServiceAccount'
 
 ENTRYPOINT = 'index'
 
+MIDDLE_TEST = {
+    'TOKEN': 'X',
+    'SECRET': 'YWRzZmFkc2ZmZGFzZA',
+    'HOST': 'http://middle.localhost/',
+    'PATH': '/resources/',
+}
+
 PASSAPORTE_WEB = {
     'HOST': 'http://dhcp48.corp:8000',
     'SLUG': 'charging',
