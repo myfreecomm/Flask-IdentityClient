@@ -157,6 +157,7 @@ class TestResourcesFromMiddle(TestCase):
 
         with patch('flask_identity_client.startup_funcs.session', session), \
              patch.object(app.logger, 'getChild') as mock_child:
+
             self.assertTrue(startup_func() is None)
             mock_child.assert_called_once_with('resources_from_middle')
             mock_child.return_value.getChild.assert_called_once_with('MIDDLE_TEST')
@@ -185,8 +186,15 @@ class TestResourcesFromMiddle(TestCase):
         response.data = 'authorization failure'
         response.headers = {}
 
-        with patch('flask_identity_client.startup_funcs.session', session):
+        from flask_identity_client.startup_funcs import app
+        with patch('flask_identity_client.startup_funcs.session', session), \
+             patch.object(app.logger, 'getChild') as mock_child:
+
             self.assertTrue(startup_func() is None)
+            call_args = mock_child.return_value.getChild.return_value.error.call_args[0]
+            self.assertEqual(call_args[0], '(%s) %s')
+            self.assertEqual(call_args[1], 'HttpLib2Error')
+            self.assertTrue(isinstance(call_args[2], HttpLib2Error))
 
         mock_remote_app.get_instance.assert_called_once_with()
         mock_remote_app.get_instance.return_value.get.assert_called_once_with(
@@ -198,9 +206,7 @@ class TestResourcesFromMiddle(TestCase):
                 'Authorization': 'Basic WDpZV1J6Wm1Ga2MyWm1aR0Z6WkE=',
             }
         )
-        self.assertEqual(session['resources'].data, 'authorization failure')
-        self.assertEqual(session['resources'].status, 401)
-        self.assertTrue(session['resources'].etag is None)
+        self.assertTrue(session['resources'] is None)
 
     @patch('flask_identity_client.startup_funcs.PWRemoteApp')
     def test_not_modified(self, mock_remote_app):

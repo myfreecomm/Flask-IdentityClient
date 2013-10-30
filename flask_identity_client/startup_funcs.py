@@ -80,7 +80,15 @@ def _resources_from_middle(settings_key):
         expires = parsedate_tz(response.headers.get('Expires'))
         expires = min(mktime_tz(expires), time() + 600) if expires else None
 
-        if response.status == 304:
+        if response.status == 200:
+            resources = Resources(
+                data = response.data,
+                etag = response.headers.get('ETag'),
+                status = response.status,
+                expires = expires,
+            )
+
+        elif response.status == 304 or current:
             # no changes
             resources = Resources(
                 data = current.data,
@@ -90,12 +98,7 @@ def _resources_from_middle(settings_key):
             )
 
         else:
-            resources = Resources(
-                data = response.data,
-                etag = response.headers.get('ETag'),
-                status = response.status,
-                expires = expires,
-            )
+            raise HttpLib2Error('status code: {}'.format(response.status))
 
         session['resources'] = resources
 
