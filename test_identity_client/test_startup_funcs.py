@@ -112,17 +112,17 @@ class TestResourcesFromMiddle(TestCase):
         }
 
         from flask_identity_client.startup_funcs import app
-        exc = HttpLib2Error()
-        def side_effect(url, headers):
-            raise exc
-        mock_remote_app.get_instance.return_value.get.side_effect = side_effect
+        mock_remote_app.get_instance.return_value.get.side_effect = HttpLib2Error
 
         with patch('flask_identity_client.startup_funcs.session', session), \
              patch.object(app.logger, 'getChild') as mock_child:
             self.assertTrue(startup_func() is None)
             mock_child.assert_called_once_with('resources_from_middle')
-            mock_child.return_value.error.assert_called_once_with(
-                '(%s) %s', 'HttpLib2Error', exc)
+            mock_child.return_value.getChild.assert_called_once_with('MIDDLE_TEST')
+            call_args = mock_child.return_value.getChild.return_value.error.call_args[0]
+            self.assertEqual(call_args[0], '(%s) %s')
+            self.assertEqual(call_args[1], 'HttpLib2Error')
+            self.assertTrue(isinstance(call_args[2], HttpLib2Error))
 
         mock_remote_app.get_instance.assert_called_once_with()
         self.assertEqual(session['resources'], None)
