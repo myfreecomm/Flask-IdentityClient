@@ -3,6 +3,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import urllib
 from functools import wraps, partial
+from collections import namedtuple
+from time import time
+from email.utils import parsedate_tz, mktime_tz
 from httplib2 import HttpLib2Error
 from flask import current_app as app, redirect, request, session, url_for, g
 from .views import PWRemoteApp
@@ -61,9 +64,40 @@ def _resources_from_middle(settings_key):
         'Accept': 'application/json',
     }
 
-    domains = None
+    current = session.get('resources')
+    if current:
+
+        if current.expires and current.expires > time():
+            # not expired yet
+            return
+
+        if current.etag:
+            headers['If-None-Match'] = current.etag
+
     try:
-        session['resources'] = PWRemoteApp.get_instance().get(url, headers=headers).data
+        response = PWRemoteApp.get_instance().get(url, headers=headers)
+
+        expires = parsedate_tz(response.headers.get('Expires'))
+        expires = min(mktime_tz(expires), time() + 600) if expires else None
+
+        if response.status == 304:
+            # no changes
+            resources = Resources(
+                data = current.data,
+                etag = current.etag,
+                status = response.status,
+                expires = expires,
+            )
+
+        else:
+            resources = Resources(
+                data = response.data,
+                etag = response.headers.get('ETag'),
+                status = response.status,
+                expires = expires,
+            )
+
+        session['resources'] = resources
 
     except HttpLib2Error, exc:
         logger = app.logger.getChild(resources_from_middle.__name__).getChild(settings_key)
@@ -81,3 +115,5 @@ def join_path(host, path):
 
 
 escape = lambda s: urllib.quote(s.encode('utf-8'), safe='~ ').replace(' ', '+')
+
+Resources = namedtuple('Resources', 'data etag status expires')
