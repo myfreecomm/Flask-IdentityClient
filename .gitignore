@@ -9,6 +9,7 @@
 .Python
 .cache
 .project
+/Flask-Identity-Client-*
 /MANIFEST
 /bin
 /build
