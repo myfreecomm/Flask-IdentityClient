@@ -102,7 +102,6 @@ class TestResourcesFromMiddle(TestCase):
             }
         )
         self.assertEqual(session['resources'].data, { 'msg': 'some data' })
-        self.assertEqual(session['resources'].status, 200)
         self.assertTrue(session['resources'].etag is None)
         self.assertTrue(session['resources'].expires is None)
 
@@ -137,7 +136,6 @@ class TestResourcesFromMiddle(TestCase):
             }
         )
         self.assertEqual(session['resources'].data, { 'msg': 'some data' })
-        self.assertEqual(session['resources'].status, 200)
         self.assertEqual(session['resources'].etag, '"d41d8cd98f00b204e9800998ecf8427e"')
 
     @patch('flask_identity_client.startup_funcs.PWRemoteApp')
@@ -221,7 +219,6 @@ class TestResourcesFromMiddle(TestCase):
             'resources': Resources(
                 data = { 'msg': 'some data' },
                 etag = '"d41d8cd98f00b204e9800998ecf8427e"',
-                status = 200,
                 expires = None,
             ),
         }
@@ -245,7 +242,6 @@ class TestResourcesFromMiddle(TestCase):
             }
         )
         self.assertEqual(session['resources'].data, { 'msg': 'some data' })
-        self.assertEqual(session['resources'].status, 304)
         self.assertEqual(session['resources'].etag, '"d41d8cd98f00b204e9800998ecf8427e"')
 
     @patch('flask_identity_client.startup_funcs.PWRemoteApp')
@@ -262,7 +258,6 @@ class TestResourcesFromMiddle(TestCase):
             'resources': Resources(
                 data = { 'msg': 'some data' },
                 etag = '"d41d8cd98f00b204e9800998ecf8427e"',
-                status = 200,
                 expires = expires,
             ),
         }
@@ -272,7 +267,6 @@ class TestResourcesFromMiddle(TestCase):
 
         self.assertFalse(mock_remote_app.get_instance.called)
         self.assertEqual(session['resources'].data, { 'msg': 'some data' })
-        self.assertEqual(session['resources'].status, 200)
         self.assertEqual(session['resources'].etag, '"d41d8cd98f00b204e9800998ecf8427e"')
         self.assertEqual(session['resources'].expires, expires)
 
@@ -289,7 +283,6 @@ class TestResourcesFromMiddle(TestCase):
             'resources': Resources(
                 data = { 'msg': 'some data' },
                 etag = None,
-                status = 200,
                 expires = time() - 1,
             ),
         }
@@ -313,6 +306,5 @@ class TestResourcesFromMiddle(TestCase):
             }
         )
         self.assertEqual(session['resources'].data, { 'msg': 'some data' })
-        self.assertEqual(session['resources'].status, 200)
         self.assertTrue(session['resources'].etag is None)
         self.assertEqual(session['resources'].expires, 784111777)

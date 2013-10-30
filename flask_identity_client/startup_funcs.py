@@ -84,7 +84,6 @@ def _resources_from_middle(settings_key):
             resources = Resources(
                 data = response.data,
                 etag = response.headers.get('ETag'),
-                status = response.status,
                 expires = expires,
             )
 
@@ -93,7 +92,6 @@ def _resources_from_middle(settings_key):
             resources = Resources(
                 data = current.data,
                 etag = current.etag,
-                status = response.status,
                 expires = expires,
             )
 
@@ -119,4 +117,4 @@ def join_path(host, path):
 
 escape = lambda s: urllib.quote(s.encode('utf-8'), safe='~ ').replace(' ', '+')
 
-Resources = namedtuple('Resources', 'data etag status expires')
+Resources = namedtuple('Resources', 'data etag expires')

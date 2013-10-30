@@ -98,5 +98,15 @@ no *config* da aplicação. O dicionário deve ter as seguintes informações:
 O resultado é armazenado na sessão, referenciado pela chave ``resources``.
 Caso ocorra algum erro, a chave existirá, mas o valor será ``None``.
 
+O objeto de recursos na chave ``resources`` da sessão possui os seguintes
+atributos:
+
+- ``data``: dados recebidos.
+
+- ``etag``: ETag da resposta, usado nas requisições seguintes.
+
+- ``expires``: data de expiração da resposta da requisição em formato
+  Posix, usado para evitar requisições múltiplas.
+
 Observação: é preciso estar logado no PassaporteWeb, pois o serviço
 atravessador receberá os mesmos dados do *login*.
