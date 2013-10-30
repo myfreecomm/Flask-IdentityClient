@@ -216,11 +216,7 @@ class TestResourcesFromMiddle(TestCase):
                 'accounts': [self.account_uuid],
             },
             'access_token': ['ZHNkc2VyZWY', '17a799ddbbbfb855f25e89d0bf51ae19'],
-            'resources': Resources(
-                data = { 'msg': 'some data' },
-                etag = '"d41d8cd98f00b204e9800998ecf8427e"',
-                expires = None,
-            ),
+            'resources': ({ 'msg': 'some data' }, '"d41d8cd98f00b204e9800998ecf8427e"', None),
         }
 
         response = mock_remote_app.get_instance.return_value.get.return_value
@@ -255,11 +251,7 @@ class TestResourcesFromMiddle(TestCase):
                 'accounts': [self.account_uuid],
             },
             'access_token': ['ZHNkc2VyZWY', '17a799ddbbbfb855f25e89d0bf51ae19'],
-            'resources': Resources(
-                data = { 'msg': 'some data' },
-                etag = '"d41d8cd98f00b204e9800998ecf8427e"',
-                expires = expires,
-            ),
+            'resources': ({ 'msg': 'some data' }, '"d41d8cd98f00b204e9800998ecf8427e"', expires),
         }
 
         with patch('flask_identity_client.startup_funcs.session', session):
@@ -280,11 +272,7 @@ class TestResourcesFromMiddle(TestCase):
                 'accounts': [self.account_uuid],
             },
             'access_token': ['ZHNkc2VyZWY', '17a799ddbbbfb855f25e89d0bf51ae19'],
-            'resources': Resources(
-                data = { 'msg': 'some data' },
-                etag = None,
-                expires = time() - 1,
-            ),
+            'resources': ({ 'msg': 'some data' }, None, time() - 1),
         }
 
         response = mock_remote_app.get_instance.return_value.get.return_value

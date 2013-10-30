@@ -66,9 +66,11 @@ def _resources_from_middle(settings_key):
 
     current = session.get('resources')
     if current:
+        current = current if isinstance(current, Resources) else Resources(*current)
 
         if current.expires and current.expires > time():
-            # not expired yet
+            # not expired yet, grant it’s a resource instance
+            session['resources'] = current
             return
 
         if current.etag:
