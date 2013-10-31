@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from time import time
 from httplib2 import HttpLib2Error
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import HTTPException, Unauthorized, Forbidden
 from flask import g, url_for
 from mock import patch
 from ._base import TestCase
@@ -219,9 +219,43 @@ class TestResourcesFromMiddle(TestCase):
             mock_child.assert_called_once_with('resources_from_middle')
             mock_child.return_value.getChild.assert_called_once_with('MIDDLE_TEST')
             call_args = mock_child.return_value.getChild.return_value.error.call_args[0]
-            self.assertEqual(call_args[0], '(%s) %s')
-            self.assertEqual(call_args[1], 'HttpLib2Error')
-            self.assertTrue(isinstance(call_args[2], HttpLib2Error))
+            self.assertEqual(call_args[0], '(%s) code:%s - %s')
+            self.assertEqual(call_args[1], 'Forbidden')
+            self.assertEqual(call_args[2], 403)
+            self.assertTrue(isinstance(call_args[3], Forbidden))
+
+        mock_remote_app.get_instance.assert_called_once_with()
+        self.assertTrue(session['resources'] is None)
+
+    @patch('flask_identity_client.startup_funcs.PWRemoteApp')
+    def test_really_unknown_response(self, mock_remote_app):
+        startup_func = resources_from_middle('MIDDLE_TEST')
+        session = {
+            'user_data': {
+                'uuid': 'a82670c2-027e-4079-b5c7-81f2433041b3',
+                'email': 'johndoe@myfreecomm.com.br',
+                'accounts': [self.account_uuid],
+            },
+            'access_token': ['ZHNkc2VyZWY', '17a799ddbbbfb855f25e89d0bf51ae19'],
+        }
+
+        response = mock_remote_app.get_instance.return_value.get.return_value
+        response.status = 529
+        response.data = 'unknown status'
+        response.headers = {}
+
+        from flask_identity_client.startup_funcs import app
+        with patch('flask_identity_client.startup_funcs.session', session), \
+             patch.object(app.logger, 'getChild') as mock_child:
+
+            self.assertTrue(startup_func() is None)
+            mock_child.assert_called_once_with('resources_from_middle')
+            mock_child.return_value.getChild.assert_called_once_with('MIDDLE_TEST')
+            call_args = mock_child.return_value.getChild.return_value.error.call_args[0]
+            self.assertEqual(call_args[0], '(%s) code:%s - %s')
+            self.assertEqual(call_args[1], 'Code529')
+            self.assertEqual(call_args[2], 529)
+            self.assertTrue(isinstance(call_args[3], HTTPException))
 
         mock_remote_app.get_instance.assert_called_once_with()
         self.assertTrue(session['resources'] is None)

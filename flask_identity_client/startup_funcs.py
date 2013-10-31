@@ -7,7 +7,7 @@ from collections import namedtuple
 from time import time
 from email.utils import parsedate_tz, mktime_tz
 from httplib2 import HttpLib2Error
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import Unauthorized, HTTPException, default_exceptions
 from flask import current_app as app, redirect, request, session, url_for, g
 from .views import PWRemoteApp
 
@@ -80,9 +80,14 @@ def _resources_from_middle(settings_key):
     try:
         session['resources'] = make_request(url, headers, current)
 
-    except HttpLib2Error, exc:
+    except HttpLib2Error as exc:
         logger = app.logger.getChild(resources_from_middle.__name__).getChild(settings_key)
         logger.error('(%s) %s', type(exc).__name__, exc)
+        session['resources'] = None
+
+    except HTTPException as exc:
+        logger = app.logger.getChild(resources_from_middle.__name__).getChild(settings_key)
+        logger.error('(%s) code:%s - %s', type(exc).__name__, exc.code, exc)
         session['resources'] = None
 
 
@@ -113,7 +118,10 @@ def make_request(url, headers, current):
         )
 
     else:
-        raise HttpLib2Error('status code: {}'.format(response.status))
+        exc_class = default_exceptions.get(response.status)
+        if not exc_class:
+            exc_class = type(b'Code{}'.format(response.status), (HTTPException,), { 'code': response.status })
+        raise exc_class(response.data)
 
 
 #-----------------------------------------------------------------------
