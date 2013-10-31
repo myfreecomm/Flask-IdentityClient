@@ -13,7 +13,7 @@ else:
 
 setup(
     name             = 'Flask-IdentityClient',
-    version          = '0.4.1',
+    version          = '0.4.2',
     license          = 'Copyright',
     platforms        = 'any',
     url              = 'https://github.com/myfreecomm/Flask-IdentityClient',
@@ -26,7 +26,7 @@ setup(
     install_requires = [
         'httplib2>=0.8',
         'requests>=1.2.3',
-        'oauth2>=1.5.211',
+        'oauth2==1.5.211',
         'Flask>=0.10.1',
         'Flask-OAuth>=0.11',
     ],

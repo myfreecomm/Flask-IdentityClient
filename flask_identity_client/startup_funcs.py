@@ -7,6 +7,7 @@ from collections import namedtuple
 from time import time
 from email.utils import parsedate_tz, mktime_tz
 from httplib2 import HttpLib2Error
+from werkzeug.exceptions import Unauthorized
 from flask import current_app as app, redirect, request, session, url_for, g
 from .views import PWRemoteApp
 
@@ -77,35 +78,42 @@ def _resources_from_middle(settings_key):
             headers['If-None-Match'] = current.etag
 
     try:
-        response = PWRemoteApp.get_instance().get(url, headers=headers)
-
-        expires = parsedate_tz(response.headers.get('Expires'))
-        expires = min(mktime_tz(expires), time() + 600) if expires else None
-
-        if response.status == 200:
-            resources = Resources(
-                data = response.data,
-                etag = response.headers.get('ETag'),
-                expires = expires,
-            )
-
-        elif response.status == 304 or current:
-            # no changes
-            resources = Resources(
-                data = current.data,
-                etag = current.etag,
-                expires = expires,
-            )
-
-        else:
-            raise HttpLib2Error('status code: {}'.format(response.status))
-
-        session['resources'] = resources
+        session['resources'] = make_request(url, headers, current)
 
     except HttpLib2Error, exc:
         logger = app.logger.getChild(resources_from_middle.__name__).getChild(settings_key)
         logger.error('(%s) %s', type(exc).__name__, exc)
         session['resources'] = None
+
+
+def make_request(url, headers, current):
+    response = PWRemoteApp.get_instance().get(url, headers=headers)
+
+    expires = parsedate_tz(response.headers.get('Expires'))
+    expires = min(mktime_tz(expires), time() + 600) if expires else None
+
+    if response.status == 200:
+        return Resources(
+            data = response.data,
+            etag = response.headers.get('ETag'),
+            expires = expires,
+        )
+
+    elif response.status == 401:
+        # unauthorized means the OAuth must be remade
+        # delegate responsability to application
+        return Unauthorized
+
+    elif response.status == 304 or current:
+        # no changes
+        return Resources(
+            data = current.data,
+            etag = current.etag,
+            expires = expires,
+        )
+
+    else:
+        raise HttpLib2Error('status code: {}'.format(response.status))
 
 
 #-----------------------------------------------------------------------

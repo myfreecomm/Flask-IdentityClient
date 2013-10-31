@@ -109,4 +109,14 @@ atributos:
   Posix, usado para evitar requisições múltiplas.
 
 Observação: é preciso estar logado no PassaporteWeb, pois o serviço
-atravessador receberá os mesmos dados do *login*.
+atravessador receberá os mesmos dados do *login*. Caso os dados de
+*login* estejam desatualizados ou o usuário não esteja logado, o valor
+de ``resources`` será ``werkzeug.exceptions.Unauthorized`` (a exceção
+**não** será levantada), delegando para a aplicação a responsabilidade
+sobre como lidar com isso.
+
+A sugestão é redirecionar o cliente para o processo de *login*::
+
+    if session['resources'] is Unauthorized:
+        session.clear()
+        return redirect(url_for('identity_client.login', next=request.url))
