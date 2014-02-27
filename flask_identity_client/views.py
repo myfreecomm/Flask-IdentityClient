@@ -3,7 +3,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from threading import Event
 from flask import abort, current_app as app, escape, redirect, request, url_for, session
-from flaskext.oauth import OAuthRemoteApp, OAuthException, parse_response
+try:
+    from flask_oauth import OAuthRemoteApp, OAuthException, parse_response
+except ImportError:
+    from flaskext.oauth import OAuthRemoteApp, OAuthException, parse_response
 from .application import blueprint
 from . import signals
 
