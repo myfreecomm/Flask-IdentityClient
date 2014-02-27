@@ -9,8 +9,6 @@ __all__ = ['app']
 DEBUG = False
 TESTING = True
 SECRET_KEY = b's17a!@M1uOv0cI_/$}@6uoJM(7,0y{Ci=N1:N3&>BG%&:V6+'
-SERVICE_ACCOUNT = 'model_resource.ServiceAccount'
-
 ENTRYPOINT = 'index'
 
 MIDDLE_TEST = {
@@ -45,6 +43,7 @@ from flask import Flask
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+from model_resource import ServiceAccount
 from flask_identity_client.startup_funcs import user_required
 @app.route('/')
 def index():

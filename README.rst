@@ -13,10 +13,6 @@ Configurações
 
 Os *settings* do Flask precisam conter as seguntes chaves:
 
-- ``SERVICE_ACCOUNT``: nome completo do *model* de conta de serviço,
-  equivalente ao *model* ``ServiceAccount`` no PassaporteWeb. Ex.:
-  ``authentication.models.ServiceAccount``.
-
 - ``PASSAPORTE_WEB``: dicionário contendo as chaves:
 
   - ``HOST``: prefixo do PassaporteWeb, incluindo protocolo. Ex.:
@@ -42,6 +38,21 @@ Os *settings* do Flask precisam conter as seguntes chaves:
   - ``ECOMMERCE_URL`` (opcional): URL da aplicação no Ecommerce.
 
 
+Sinais
+------
+
+Flask-IdentityClient oferece o sinal
+``flask_identity_client.signal.update_service_account``, que precisa ser
+conectado a uma função com assinatura ``(sender, user_data, callback)``
+para efetuar as atualizações do *model* equivalente a ``ServiceAccount``
+do PassaporteWeb.
+
+O parâmetro ``calback`` é uma função que recebe como único parâmetro uma
+lista dos UUIDs das contas autorizadas. Essas contas estarão listadas
+na chave ``accounts`` dentro do dicionário apontado pela chave de sessão
+``user_data``.
+
+
 *Blueprint*
 -----------
 
@@ -64,16 +75,6 @@ usar::
 
     # blueprint aqui é o blueprint alvo, não flask_identity_client!
     blueprint.before_request(user_required)
-
-
-*Callback* de atualização de contas de serviço
-----------------------------------------------
-
-A classe de conta de serviço (``ServiceAccount``) deve possuir o método
-de classe ``update()``, que recebe uma lista de dicionários
-representando as contas de cobrança identificados para o usuário no
-PassaporteWeb, e deve retornar uma lista dos UUIDs válidos na aplicação
-local.
 
 
 Obtendo recursos de um serviço atravessador
@@ -120,3 +121,21 @@ A sugestão é redirecionar o cliente para o processo de *login*::
     if session['resources'] is Unauthorized:
         session.clear()
         return redirect(url_for('identity_client.login', next=request.url))
+
+
+CHANGELOG
+=========
+
+Até versão 0.4.2, a atualização era realizada passando para a biblioteca
+o caminho para encontrar o *model* ``ServiceAccount``, na chave
+``SERVICE_ACCOUNT`` dos *settings*.
+
+A partir da versão 0.5, Flask-IdentityClient não precisa mais conhecer
+detalhes de implementação da aplicação. Para atualizar a base local,
+basta conectar um *handler* ao sinal
+``flask_identity_client.signal.update_service_account``, conforme
+descrito acima.
+
+Porém, **é necessário** atualizar o comportamento das aplicações
+antigas, que não serão mais compatíveis com as novas versões de
+Flask-IdentityClient.

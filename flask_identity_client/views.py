@@ -1,10 +1,11 @@
 # coding: UTF-8
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from flask import current_app as app, escape, redirect, request, url_for, session
+from threading import Event
+from flask import abort, current_app as app, escape, redirect, request, url_for, session
 from flaskext.oauth import OAuthRemoteApp, OAuthException, parse_response
 from .application import blueprint
-from .models import get_service_account
+from . import signals
 
 __all__ = []
 
@@ -14,7 +15,6 @@ def index():
     #-------------------------------------------------------------------
     # Autenticação
     #
-    ServiceAccount = get_service_account()
     access_token = session.get('access_token')
 
     if access_token is None:
@@ -44,8 +44,19 @@ def index():
     else:
         user_data['full_name'] = user_data['email']
 
-    user_data['accounts'] = ServiceAccount.update(original_user_data.get('accounts', []))
-    session['user_data'] = user_data
+    event = Event()
+
+    def callback(account_uuid_list):
+        if not event.is_set():
+            user_data['accounts'] = list(account_uuid_list)
+            session['user_data'] = user_data
+            event.set()
+
+    signals.update_service_account.send(app._get_current_object(),
+                                        user_data=original_user_data, callback=callback)
+
+    if not event.wait(timeout=20):
+        abort(500, 'session callback not called')
 
     next_url = escape(request.values.get('next') \
                    or url_for(app.config.get('ENTRYPOINT', 'index')))
