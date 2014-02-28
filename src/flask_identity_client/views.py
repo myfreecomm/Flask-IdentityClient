@@ -51,10 +51,11 @@ def index():
         user_data=original_user_data,
     )
 
-    user_data['accounts'] = [uuid for uuid in (
+    user_data['accounts'] = [
         account.get('uuid')
         for account in original_user_data.get('accounts', [])
-    ) if uuid]
+        if account.get('uuid')
+    ]
     session['user_data'] = user_data
 
     next_url = escape(request.values.get('next') \
