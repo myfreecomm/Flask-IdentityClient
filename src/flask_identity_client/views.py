@@ -1,7 +1,6 @@
 # coding: UTF-8
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from threading import Event
 from flask import abort, current_app as app, escape, redirect, request, url_for, session
 try:
     from flask_oauth import OAuthRemoteApp, OAuthException, parse_response
@@ -47,19 +46,16 @@ def index():
     else:
         user_data['full_name'] = user_data['email']
 
-    event = Event()
+    signals.update_service_account.send(
+        app._get_current_object(),
+        user_data=original_user_data,
+    )
 
-    def callback(account_uuid_list):
-        if not event.is_set():
-            user_data['accounts'] = list(account_uuid_list)
-            session['user_data'] = user_data
-            event.set()
-
-    signals.update_service_account.send(app._get_current_object(),
-                                        user_data=original_user_data, callback=callback)
-
-    if not event.wait(timeout=20):
-        abort(500, 'session callback not called')
+    user_data['accounts'] = [uuid for uuid in (
+        account.get('uuid')
+        for account in original_user_data.get('accounts', [])
+    ) if uuid]
+    session['user_data'] = user_data
 
     next_url = escape(request.values.get('next') \
                    or url_for(app.config.get('ENTRYPOINT', 'index')))

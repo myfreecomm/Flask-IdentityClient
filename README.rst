@@ -43,14 +43,17 @@ Sinais
 
 Flask-IdentityClient oferece o sinal
 ``flask_identity_client.signal.update_service_account``, que precisa ser
-conectado a uma função com assinatura ``(sender, user_data, callback)``
-para efetuar as atualizações do *model* equivalente a ``ServiceAccount``
-do PassaporteWeb.
+conectado a um *handler* com assinatura ``(sender, user_data)`` para
+efetuar as atualizações do *model* equivalente a ``ServiceAccount`` do
+PassaporteWeb.
 
-O parâmetro ``calback`` é uma função que recebe como único parâmetro uma
-lista dos UUIDs das contas autorizadas. Essas contas estarão listadas
-na chave ``accounts`` dentro do dicionário apontado pela chave de sessão
-``user_data``.
+A lista de contas do usuário enviada pelo PassaporteWeb encontra-se na
+chave ``accounts`` de ``user_data`` e pode ser modificada. Um lista com
+os UUIDs das contas que permanecerem na chave após processamento dos
+*handlers* será adicionada à chave ``accounts`` do dicionário
+``user_data`` na sessão, que contém outras chaves importantes, como
+``uuid``, ``email``, ``first_name``, ``last_name`` e ``full_name`` do
+usuário (*identity*) autenticado.
 
 
 *Blueprint*

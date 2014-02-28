@@ -63,12 +63,13 @@ class TestIndex(TestCase):
             'accounts': ['d9a795c8-c891-4665-ac63-9d408209be29'],
         })
 
+    @patch.object(ServiceAccount, 'update')
     @patch('flask_identity_client.views.PWRemoteApp')
     @patch('flask_identity_client.views.session')
-    def test_user_without_accounts(self, session, remote_app):
+    def test_user_without_accounts(self, session, remote_app, update_service_account):
         session.get.return_value = ('R0JaNT1RKNDP', 'W3oZSRHACS090Xwf')
         remote_app_instance = remote_app.get_instance.return_value
-        remote_app_instance.post.return_value.data = {
+        data = remote_app_instance.post.return_value.data = {
             'uuid': 'a82670c2-027e-4079-b5c7-81f2433041b3',
             'email': 'johndoe@myfreecomm.com.br',
             'is_active': True,
@@ -84,6 +85,7 @@ class TestIndex(TestCase):
         self.assertEqual(response.headers['Location'], url_for('index', _external=True))
         remote_app.get_instance.assert_called_once_with()
         remote_app_instance.post.assert_called_once_with(fetch_user_data_url)
+        update_service_account.assert_called_once_with(data)
 
         session.__setitem__.assert_called_once_with('user_data', {
             'uuid': 'a82670c2-027e-4079-b5c7-81f2433041b3',
@@ -92,12 +94,13 @@ class TestIndex(TestCase):
             'accounts': [],
         })
 
+    @patch.object(ServiceAccount, 'update')
     @patch('flask_identity_client.views.PWRemoteApp')
     @patch('flask_identity_client.views.session')
-    def test_new_account(self, session, remote_app):
+    def test_new_account(self, session, remote_app, update_service_account):
         session.get.return_value = ('R0JaNT1RKNDP', 'W3oZSRHACS090Xwf')
         remote_app_instance = remote_app.get_instance.return_value
-        remote_app_instance.post.return_value.data = {
+        data = remote_app_instance.post.return_value.data = {
             'uuid': 'a82670c2-027e-4079-b5c7-81f2433041b3',
             'email': 'johndoe@myfreecomm.com.br',
             'is_active': True,
@@ -119,6 +122,7 @@ class TestIndex(TestCase):
         self.assertEqual(response.headers['Location'], url_for('index', _external=True))
         remote_app.get_instance.assert_called_once_with()
         remote_app_instance.post.assert_called_once_with(fetch_user_data_url)
+        update_service_account.assert_called_once_with(data)
 
         session.__setitem__.assert_called_once_with('user_data', {
             'uuid': 'a82670c2-027e-4079-b5c7-81f2433041b3',
@@ -127,12 +131,13 @@ class TestIndex(TestCase):
             'accounts': ['d9a795c8-c891-4665-ac63-9d408209be29'],
         })
 
+    @patch.object(ServiceAccount, 'update')
     @patch('flask_identity_client.views.PWRemoteApp')
     @patch('flask_identity_client.views.session')
-    def test_next_url(self, session, remote_app):
+    def test_next_url(self, session, remote_app, update_service_account):
         session.get.return_value = ('R0JaNT1RKNDP', 'W3oZSRHACS090Xwf')
         remote_app_instance = remote_app.get_instance.return_value
-        remote_app_instance.post.return_value.data = {
+        data = remote_app_instance.post.return_value.data = {
             'uuid': 'a82670c2-027e-4079-b5c7-81f2433041b3',
             'email': 'johndoe@myfreecomm.com.br',
             'is_active': True,
@@ -147,7 +152,7 @@ class TestIndex(TestCase):
 
         response = self.client.get(self.get_url('http://www.google.com/'))
         self.assertStatus(response, 302)
-
+        update_service_account.assert_called_once_with(data)
         self.assertEqual(response.headers['Location'], 'http://www.google.com/')
 
 

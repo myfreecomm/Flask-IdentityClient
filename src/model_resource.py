@@ -10,10 +10,10 @@ class ServiceAccount(object):
 
     @classmethod
     def update(cls, user_data):
-        accounts = user_data.get('accounts')
-        return (account['uuid'] for account in accounts)
+        # Nothing todo do
+        pass
 
 
 @signals.update_service_account.connect
-def update(sender, user_data, callback):
-    callback(ServiceAccount.update(user_data))
+def update(sender, user_data):
+    ServiceAccount.update(user_data)
