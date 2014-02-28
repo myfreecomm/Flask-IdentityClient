@@ -27,7 +27,7 @@ Os *settings* do Flask precisam conter as seguntes chaves:
   - ``ACCESS_TOKEN_PATH``: *path* da URL de troca de *token*. Ex.:
     ``/sso/token/``.
 
-  - ``AUTHORIZATION_PATH``: *PATY* da URL de autorização. Ex.:
+  - ``AUTHORIZATION_PATH``: *path* da URL de autorização. Ex.:
     ``/sso/authorize/``.
 
   - ``SCOPE``: escopo OAuth, padrão: ``auth:api``.
